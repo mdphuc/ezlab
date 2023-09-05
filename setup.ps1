@@ -6,7 +6,7 @@ $user = $env:USERPROFILE
 
 cd "$($drive)\Program Files\Oracle\VirtualBox"
 
-if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "network" -And $setting -ne "firewall" -And $setting -ne "Vuln" -And $setting -ne "firewall_setup"){
+if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "network" -And $setting -ne "Vuln" ){
     Write-Host "
 ./setup.ps1
 
@@ -20,9 +20,8 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "network" -And $se
     [size] : Size of your disk in MB (default: 30720)
     VM : setup VM
     Vuln : add Vulnerable VM to your environment
-    network: setup internal network
-    firewall: setup firewall (pfsense)
-    firewall_setup: setup firewall (pfsense)
+    intnetwork: setup internal network
+    natnetwork: attach VM to NAT
     "
 }elseif($setting -eq "os"){
     Invoke-Command{.\VBoxManage list ostypes} | ForEach-Object -Process {Write-Host $_}
@@ -88,22 +87,10 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "network" -And $se
 
     }
 
-}elseif($setting -eq "firewall"){
-    $VMNum = $(Invoke-Command {.\VBoxManage list vms}).Length
-    $PfsensePath = Read-Host "Pfsense path"
-    try{
-        Invoke-Command {.\VBoxManage createvm --name pfsense --ostype FreeBSD_64 --register}
-        Invoke-Command {.\VBoxManage modifyvm pfsense --cpus 2 --memory 1024 --vram 12} 
-        Invoke-Command {.\VBoxManage createhd --filename "$($env:USERPROFILE)\VirtualBox VMs\pfsense\pfsense.vdi" --size 10240 --variant Standard}
-        Invoke-Command {.\VBoxManage storagectl pfsense --name "SATA Controller $($VMNum)" --add sata --bootable on}
-        Invoke-Command {.\VBoxManage storageattach pfsense --storagectl "SATA Controller $($VMNum)" --port 0 --device 0 --type hdd --medium "$($env:USERPROFILE)\VirtualBox VMs\pfsense\pfsense.vdi"} 
-        Invoke-Command {.\VBoxManage storagectl pfsense --name "IDE Controller $($VMNum)" --add ide}
-        Invoke-Command {.\VBoxManage storageattach pfsense --storagectl "IDE Controller $($VMNum)" --port 0 --device 0 --type dvddrive --medium $PfsensePath}
-    }catch{
-        Write-Host $_
-    }
 }elseif($setting -eq "network"){
-    Invoke-Command {.\VBoxManage dhcpserver add --network=IsolatedNetwork --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
+    $lab_number = Read-Host "Lab number"
+    $NetworkName = "IsolatedNetwork$($lab_number)"
+    Invoke-Command {.\VBoxManage dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
 }elseif($setting -eq "Vuln"){
     $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
