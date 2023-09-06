@@ -27,7 +27,6 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
 }elseif($setting -eq "os"){
     Invoke-Command{.\VBoxManage list ostypes} | ForEach-Object -Process {Write-Host $_}
 }elseif($setting -eq "vm"){
-    Write-Host $location
     $jsonBase = @{}
     $list = New-Object System.Collections.ArrayList
     $vm = New-Object System.Collections.ArrayList
