@@ -31,7 +31,7 @@ git clone https://github.com/mdphuc/ezlab.git
 
 ## Recommended System Requirement
 - Windows 10+
-- 16GB+ of RAM
+- 8GB is fine, 16GB+ is recommended
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you think should be changed.
