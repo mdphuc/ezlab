@@ -23,6 +23,7 @@ git clone https://github.com/mdphuc/hacklab.git
     intnet: setup internal network
     natnet: attach VM to NAT
 ```
+
 ```powershell
 ./setup.ps1 vm & ./setup.ps1 vuln
 ```
