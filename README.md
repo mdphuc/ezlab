@@ -1,5 +1,5 @@
 # HackLab v1.0
-The project is designed to help create virtual machine and hacking lab on Virtual Box faster
+The project is designed to help create virtual machine and hacking lab on Virtual Box faster on Windows
 ## Installation 
 Use [git]("https://git-scm.com/") to install:
 ```bash
@@ -28,7 +28,9 @@ git clone https://github.com/mdphuc/hacklab.git
 ```
 <img width="550" alt="commandvm" src="https://github.com/mdphuc/hacklab/assets/41264640/5cf68ab6-c555-4c98-811d-9a31e207b4f0">
 
-
+## Recommended System Requirement
+- Windows 10+
+- 16GB+ of RAM
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you think should be changed.
