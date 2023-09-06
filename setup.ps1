@@ -19,8 +19,8 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     [RAM] : amount of memory in MB (default : 1024)
     [VRAM] : Amount of video memory in MB (default: 12) 
     [size] : Size of your disk in MB (default: 30720)
-    VM : setup VM
-    Vuln : add Vulnerable VM to your environment
+    vm : setup VM
+    vuln : add Vulnerable VM to your environment
     intnet: setup internal network
     natnet: attach VM to NAT
     "
