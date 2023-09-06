@@ -12,13 +12,14 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
 ./setup.ps1
 
     [lab number] : number of your lab
-    [media path] : FULL PATH to the file download of your VM (e.g: C:/Users/path/to/your/<VM file>)
-    [pfsense path] : FULL PATH to the file download of pfsense (e.g: C:/Users/path/to/the/<pfsense file>)
+    [Name] : name of your VM
+    [Path] : FULL PATH to the file download of your VM (e.g: C:/Users/path/to/your/<VM file>)
     [OS type] : for more information, run ./setup.ps1 os
     [CPU] : number of core (default: 2)
     [RAM] : amount of memory in MB (default : 1024)
     [VRAM] : Amount of video memory in MB (default: 12) 
     [size] : Size of your disk in MB (default: 30720)
+    
     vm : setup VM
     vuln : add Vulnerable VM to your environment
     intnet: setup internal network
