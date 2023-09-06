@@ -23,7 +23,7 @@ git clone https://github.com/mdphuc/hacklab.git
     intnet: setup internal network
     natnet: attach VM to NAT
 ```
-Should use ```setup.ps1``` and ```lab.json``` in the same directory
+- Should use ```setup.ps1``` and ```lab.json``` in the same directory
 ```powershell
 ./setup.ps1 vm & ./setup.ps1 vuln
 ```
