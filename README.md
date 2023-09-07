@@ -1,5 +1,5 @@
 # EzLab v1.0
-This project is designed to help create virtual machine and hacking lab on Virtual Box on Windows faster
+This project is designed to help create virtual machine and hacking lab on Virtual Box on Windows faster and more convenient
 ## Installation 
 Use [git]("https://git-scm.com/") to install:
 ```bash
