@@ -91,9 +91,9 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         }
         if($Json.$lab_number -eq $null){
             $jsonBase | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
-            $Json.$lab_number.VM += "$($Name)"
+            $Json.$lab_number."VM" += "$($Name)"
         }else{
-            $Json.$lab_number.VM += "$($Name)"
+            $Json.$lab_number."VM" += "$($Name)"
             $Json | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
         }
         Write-Host "Successfully Created virtual machine named $($Name)"
@@ -164,9 +164,9 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         }
         if($Json.$lab_number -eq $null){
             $jsonBase | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
-            $Json.$lab_number.VM += "$($Name)"
+            $Json.$lab_number."VM" += "$($Name)"
         }else{
-            $Json.$lab_number.VM += "$($Name)"
+            $Json.$lab_number."VM" += "$($Name)"
             $Json | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
         }
         Write-Host "Successfully Created vuln machine named $($Name)"
