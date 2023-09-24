@@ -26,20 +26,11 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     remove_machine: remove a machine
     remove_lab: remove a lab
     clone: clone a machine
-    upgrade: upgrade version of a machine
+    upgrade: upgrade version of a machine (iso)
     "
 }elseif($setting -eq "os"){
     Invoke-Command{.\VBoxManage list ostypes} | ForEach-Object -Process {Write-Host $_}
 }elseif($setting -eq "vm"){
-    $jsonBase = @{}
-    $list = New-Object System.Collections.ArrayList
-    $vm = New-Object System.Collections.ArrayList
-    $vuln = New-Object System.Collections.ArrayList
-    $lab_number = Read-Host "Lab number"
-    $machine = @{"VM"=$vm;"Vuln"=$vuln}
-    $jsonBase.Add("$($lab_number)",$machine)
-    $Json = Get-Content -Raw "$($location)\lab.json" | ConvertFrom-Json
-
     $Name = Read-Host "Name"
     # $MediaPath = "$(Read-Host "Path: ")"
     $MediaPath = Read-Host "Path"
@@ -65,7 +56,6 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         Write-Host "There are some problem associated with the value of VM Name, Path, or OS"
     
     }else{
-        # $jsonBase.Add("$($lab_number)", $list)
         $VMNum = $(Invoke-Command {.\VBoxManage list vms}).Length
         try{
             Invoke-Command {.\VBoxManage createvm --name $Name --ostype $OSType --register}
@@ -89,13 +79,6 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         }catch{
             Write-Host $_
         }
-        if($Json.$lab_number -eq $null){
-            $jsonBase | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
-            $Json.$lab_number."VM" += "$($Name)"
-        }else{
-            $Json.$lab_number."VM" += "$($Name)"
-            $Json | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
-        }
         Write-Host "Successfully Created virtual machine named $($Name)"
     }
 
@@ -104,15 +87,6 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     $NetworkName = "IsolatedNetwork$($lab_number)"
     Invoke-Command {.\VBoxManage dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
 }elseif($setting -eq "Vuln"){
-    $jsonBase = @{}
-    $list = New-Object System.Collections.ArrayList
-    $vm = New-Object System.Collections.ArrayList
-    $vuln = New-Object System.Collections.ArrayList
-    $lab_number = Read-Host "Lab number"
-    $machine = @{"VM"=$vm;"Vuln"=$vuln}
-    $jsonBase.Add("$($lab_number)",$machine)
-    $Json = Get-Content -Raw "$($location)\lab.json" | ConvertFrom-Json
-
     $Name = Read-Host "Name"
     # $MediaPath = "$(Read-Host "Path: ")"
     $MediaPath = Read-Host "Path"
@@ -162,47 +136,31 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         }catch{
             Write-Host $_
         }
-        if($Json.$lab_number -eq $null){
-            $jsonBase | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
-            $Json.$lab_number."VM" += "$($Name)"
-        }else{
-            $Json.$lab_number."VM" += "$($Name)"
-            $Json | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
-        }
         Write-Host "Successfully Created vuln machine named $($Name)"
     }
 }elseif($setting -eq "remove_machine"){
     $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
-    $Json = Get-Content -Raw "$($location)\lab.json" | ConvertFrom-Json
     try{
-        Invoke-Command {.\VBoxManage modifyvm --name $Name --groups ""}
+        Invoke-Command {.\VBoxManage modifyvm $Name --groups ""}
         Invoke-Command {.\VBoxManage unregistervm $Name --delete}
-        $Json.$lab_number."VM" -= $Name
-        $Json | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
     }catch{
         Write-Host $_
     }
     
 }elseif($setting -eq "remove_lab"){
     $lab_number = Read-Host "Lab number"
-    $Json = Get-Content -Raw "$($location)\lab.json" | ConvertFrom-Json
-    ForEach($machine in $Json.$lab_number."VM"){
+    $vmsl = Invoke-Command {.\VBoxManage list -l vms | Select-String "/Lab$($lab_number)/VM" -Context 1,0 -CaseSensitive}
+    ForEach($machine in $vmsl){
+        $machine = $machine -replace " ",""
+        $machine = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2)
         try{
-            Invoke-Command {.\VBoxManage modifyvm --name $machine --groups ""}
+            Invoke-Command {.\VBoxManage modifyvm $machine --groups ""}
             Invoke-Command {.\VBoxManage unregistervm $machine --delete}
         }catch{
             Write-Host $_
         }
     }
-    try{
-        $Json.$lab_number = $Json.$lab_number | Select-Object "VM" -ExcludeProperty "VM"
-        $Json.$lab_number = $Json.$lab_number | Select-Object "Vuln" -ExcludeProperty "Vuln"
-        $Json | ConvertTo-Json -Depth 10 | Out-File "$($location)\lab.json"
-    }catch{
-        Write-Host $_
-    }
-    
 }elseif($setting -eq "clone"){
     $Name = Read-Host "Name of the machine you want to clone"
     $Name_clone = Read-Host "Name of new machine"

@@ -7,21 +7,24 @@ git clone https://github.com/mdphuc/ezlab.git
 ```
 ## Usage
 ```powershell
-./setup.ps1 <command>
+./setup.ps1
 
     [lab number] : number of your lab
-    [media path] : FULL PATH to the file download of your VM (e.g: C:/Users/path/to/your/<VM file>)
-    [pfsense path] : FULL PATH to the file download of pfsense (e.g: C:/Users/path/to/the/<pfsense file>)
+    [Name] : name of your VM
+    [Path] : FULL PATH to the file download of your VM (e.g: C:/Users/path/to/your/<VM file>) (iso file)
     [OS type] : for more information, run ./setup.ps1 os
     [CPU] : number of core (default: 2)
     [RAM] : amount of memory in MB (default : 1024)
     [VRAM] : Amount of video memory in MB (default: 12) 
     [size] : Size of your disk in MB (default: 30720)
-
+    
     vm : setup VM
     vuln : add Vulnerable VM to your environment
     intnet: setup internal network
-    natnet: attach VM to NAT
+    remove_machine: remove a machine
+    remove_lab: remove a lab
+    clone: clone a machine
+    upgrade: upgrade version of a machine (iso)
 ```
 - Should use ```setup.ps1``` and ```lab.json``` in the same directory
 ```powershell
