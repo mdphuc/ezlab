@@ -13,7 +13,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
 
     [lab number] : number of your lab
     [Name] : name of your VM
-    [Path] : FULL PATH to the file download of your VM (e.g: C:/Users/path/to/your/<VM file>)
+    [Path] : FULL PATH to the file download of your VM (e.g: C:/Users/path/to/your/<VM file>) (iso file)
     [OS type] : for more information, run ./setup.ps1 os
     [CPU] : number of core (default: 2)
     [RAM] : amount of memory in MB (default : 1024)
