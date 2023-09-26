@@ -26,7 +26,6 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     remove_machine: remove a machine
     remove_lab: remove a lab
     clone: clone a machine
-    upgrade: upgrade version of a machine (iso)
     "
 }elseif($setting -eq "os"){
     Invoke-Command{.\VBoxManage list ostypes} | ForEach-Object -Process {Write-Host $_}
@@ -170,24 +169,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     }catch{
         Write-Host $_
     }
-}elseif($setting -eq "upgrade"){
-    $VMNum = $(Invoke-Command {.\VBoxManage list vms}).Length
-    $Name = Read-Host "Name"
-    $Path = Read-Host "Path to the later version image file"
-    for ($i = 1; $i -lt $VMNum; $i++){
-        try{
-            Invoke-Command {.\VBoxManage storageattach $Name --storagectl "IDE Controller $($i)" --port 0 --device 0 --type dvddrive --forceunmount --medium none}
-        }catch{
-            $ErrorActionPreference = "Continue"
-        }
-    }
-    for ($i = 1; $i -lt $VMNum; $i++){
-        try{
-            Invoke-Command {.\VBoxManage storageattach $Name --storagectl "IDE Controller $($i)" --port 0 --device 0 --type dvddrive --forceunmount --medium $Path}
-        }catch{
-            $ErrorActionPreference = "Continue"
-        }
-    }
 }
+
 
 cd "$($location)"
