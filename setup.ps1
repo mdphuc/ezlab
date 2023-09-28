@@ -23,6 +23,8 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     vm: setup VM
     vuln: add Vulnerable VM to your environment
     ova: import ova file
+        VM: create virtual machine
+        Vuln: create vulnerable machine
     dhcp: dhcpserver
         create: create dhcp server
         list: list dhcp server
@@ -82,10 +84,11 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --nic1 intnet}
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --intnet1 "IsolatedNetwork$($lab_number)"}
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --nic2 nat}
+            Write-Host "Successfully create virtual machine named $($Name)"
         }catch{
             Write-Host $_
         }
-        Write-Host "Successfully Created virtual machine named $($Name)"
+        
     }
 
 }elseif($setting -eq "intnet"){
@@ -127,8 +130,6 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
      if($Size -eq $null -Or $Size -lt 5120){
         $Size = 30720
     }
-    Write-Host $CPU, $RAM, $VRAM, $Size
-    Write-Host $CPU.GetType(), $RAM.GetType(), $VRAM.GetType(), $Size.GetType()
     if($Name -eq $null -Or $MediaPath -eq $null -Or $OSType -eq $null){
         Write-Host "There are some problem associated with the value of VM Name, Path, or OS"
     
@@ -136,7 +137,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         $VMNum = $(Invoke-Command {.\VBoxManage.exe list vms}).Length
         try{
             Invoke-Command {.\VBoxManage.exe createvm --name $Name --ostype $OSType --register}
-            Invoke-Command {.\VBoxManage.exe modifyvm --name $Name --groups "/Lab$($lab_number)/Vuln"}
+            Invoke-Command {.\VBoxManage.exe modifyvm $Name --groups "/Lab$($lab_number)/Vuln"}
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --cpus $CPU --memory $RAM --vram $VRAM} 
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --graphicscontroller vmsvga}
             Invoke-Command {.\VBoxManage.exe createhd --filename "$($env:USERPROFILE)\VirtualBox VMs\$($Name)\$($Name).vdi" --size $Size --variant Standard}
@@ -152,17 +153,17 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
             }
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --nic1 intnet}
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --intnet1 "IsolatedNetwork$($lab_number)"}
+            Write-Host "Successfully create vuln machine named $($Name)"
         }catch{
             Write-Host $_
         }
-        Write-Host "Successfully Created vuln machine named $($Name)"
+       
     }
 }elseif($setting -eq "remove_machine"){
-    $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
     try{
         Invoke-Command {.\VBoxManage.exe unregistervm $Name --delete}
-        Invoke-Comamnd {.\VBoxManage.exe dhcpserver remove --network "IsolatedNetwork$($lab_number)"}
+        Invoke-Command {.\VBoxManage.exe dhcpserver remove --network "IsolatedNetwork$($lab_number)"}
     }catch{
         Write-Host $_
     }
@@ -203,7 +204,9 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         Write-Host $_
     }
 }elseif($setting -eq "ova"){
+    $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
+    $Type = Read-Host "Type (VM, Vuln)"
     # $MediaPath = "$(Read-Host "Path: ")"
     $MediaPath = Read-Host "Path"
     # $OSType = Read-Host "OS: "
@@ -224,35 +227,36 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
      if($Size -eq $null -Or $Size -lt 5120){
         $Size = 30720
     }
-    Write-Host $CPU, $RAM, $VRAM, $Size
-    Write-Host $CPU.GetType(), $RAM.GetType(), $VRAM.GetType(), $Size.GetType()
     if($Name -eq $null -Or $MediaPath -eq $null -Or $OSType -eq $null){
         Write-Host "There are some problem associated with the value of VM Name, Path, or OS"
     
     }else{
-        $VMNum = $(Invoke-Command {.\VBoxManage.exe list vms}).Length
-        try{
-            Invoke-Command {.\VBoxManage.exe createvm --name $Name --ostype $OSType --register}
-            Invoke-Command {.\VBoxManage.exe modifyvm --name $Name --groups "/Lab$($lab_number)/Vuln"}
-            # Invoke-Command {.\VBoxManage.exe modifyvm $Name --cpus $CPU --memory $RAM --vram $VRAM} 
-            # Invoke-Command {.\VBoxManage.exe modifyvm $Name --graphicscontroller vmsvga}
-            # Invoke-Command {.\VBoxManage.exe createhd --filename "$($env:USERPROFILE)\VirtualBox VMs\$($Name)\$($Name).vdi" --size $Size --variant Standard}
-            # Invoke-Command {.\VBoxManage.exe storagectl $Name --name "SATA Controller $($VMNum)" --add sata --bootable on}
-            # Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "SATA Controller $($VMNum)" --port 0 --device 0 --type hdd --medium "$($env:USERPROFILE)\VirtualBox VMs\$($Name)\$($Name).vdi"} 
-            # Invoke-Command {.\VBoxManage.exe storagectl $Name --name "IDE Controller $($VMNum)" --add ide}
-            # Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "IDE Controller $($VMNum)" --port 0 --device 0 --type dvddrive --medium $MediaPath}
-            # try{
-            #     $NetworkName = "IsolatedNetwork$($lab_number)"
-            #     Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
-            # }catch{
-            #     $ErrorActionPreference = "Continue"
-            # }
-            # Invoke-Command {.\VBoxManage.exe modifyvm $Name --nic1 intnet}
-            # Invoke-Command {.\VBoxManage.exe modifyvm $Name --intnet1 "IsolatedNetwork$($lab_number)"}
-        }catch{
-            Write-Host $_
+        if($Type -eq "VM" -Or $Type -eq "Vuln"){
+            $VMNum = $(Invoke-Command {.\VBoxManage.exe list vms}).Length
+            try{
+                Invoke-Command {.\VBoxManage.exe import $MediaPath --vsys 0 --vmname $Name --cpus $CPU --memory $RAM}
+                try{
+                    $NetworkName = "IsolatedNetwork$($lab_number)"
+                    Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
+                }catch{
+                    $ErrorActionPreference = "Continue"
+                }
+                if($Type -eq "VM" -And $Type -ne "Vuln"){
+                    Invoke-Command {.\VBoxManage.exe modifyvm $Name --nic1 intnet}
+                    Invoke-Command {.\VBoxManage.exe modifyvm $Name --intnet1 "IsolatedNetwork$($lab_number)"}
+                    Write-Host "Successfully create virtual machine named $($Name)"
+                }elseif($Type -eq "Vuln"){
+                    Invoke-Command {.\VBoxManage.exe modifyvm $Name --nic1 intnet}
+                    Invoke-Command {.\VBoxManage.exe modifyvm $Name --intnet1 "IsolatedNetwork$($lab_number)"}
+                    Invoke-Command {.\VBoxManage.exe modifyvm $Name --nic2 nat}
+                    Write-Host "Successfully create vuln machine named $($Name)"
+                }
+            }catch{
+                Write-Host $_
+            }
+        }else{
+            Write-Host "Invalid Type"
         }
-        Write-Host "Successfully Created vuln machine named $($Name)"
     }
 }
 
