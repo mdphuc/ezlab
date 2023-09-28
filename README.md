@@ -46,5 +46,16 @@ git clone https://github.com/mdphuc/ezlab.git
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you think should be changed.
 
+## Disclaimer
+This works fine on Powershell 5+ and Virtual Box 7.
+For Virtual Box 6., please replace line 178:
+```
+$machine = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2 -19 -2)
+```
+to this 
+```
+$machine = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2)
+```
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
