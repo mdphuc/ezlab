@@ -7,7 +7,7 @@ $username = $env:USERNAME
 
 cd "$($drive)\Program Files\Oracle\VirtualBox"
 
-if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $setting -ne "Vuln" -And $setting -ne "natnet" -And $setting -ne "remove_machine" -And $setting -ne "remove_lab" -And $setting -ne "clone" -And $setting -ne "upgrade" -And $setting -ne "ova" -And $setting -ne "lab"){
+if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $setting -ne "Vuln" -And $setting -ne "natnet" -And $setting -ne "remove_machine" -And $setting -ne "remove_lab" -And $setting -ne "clone" -And $setting -ne "upgrade" -And $setting -ne "ova" -And $setting -ne "lab" -And $setting -ne "network_remove" -And $setting -ne "dhcp"){
     Write-Host "
 ./setup.ps1
 
@@ -23,7 +23,11 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     vm: setup VM
     vuln: add Vulnerable VM to your environment
     ova: import ova file
-    intnet: setup internal network
+    dhcp: dhcpserver
+        create: create dhcp server
+        list: list dhcp server
+        remove: remove dhcp server
+    intnet: list internal network
     remove_machine: remove a machine
     remove_lab: remove a lab
     clone: clone a machine
@@ -85,9 +89,21 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     }
 
 }elseif($setting -eq "intnet"){
-    $lab_number = Read-Host "Lab number"
-    $NetworkName = "IsolatedNetwork$($lab_number)"
-    Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
+    Invoke-Command {.\VBoxManage.exe list intnets}
+}elseif($setting -eq "dhcp"){
+    $option = Read-Host "Option (create, list, remove)"
+    if($option -eq "create" -And $option -ne "list" -And $option -ne "remove"){
+        $NetworkName = Read-Host "Network Name"
+        Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
+        Write-Host "Created network name $($(NetworkName))"
+    }elseif($option -eq "list"){
+        Invoke-Command {.\VBoxManage.exe list dhcpservers}
+    }elseif($option -eq "remove"){
+        $NetworkName = Read-Host "Network Name"
+        Invoke-Command {.\VBoxManage.exe dhcpserver remove --network $NetworkName}
+    }else{
+        Write-Host "Invalid Option"
+    }
 }elseif($setting -eq "Vuln"){
     $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
