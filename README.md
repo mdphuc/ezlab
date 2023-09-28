@@ -18,13 +18,20 @@ git clone https://github.com/mdphuc/ezlab.git
     [VRAM] : Amount of video memory in MB (default: 12) 
     [size] : Size of your disk in MB (default: 30720)
     
-    vm : setup VM
-    vuln : add Vulnerable VM to your environment
-    intnet: setup internal network
+    vm: setup VM
+    vuln: add Vulnerable VM to your environment
+    ova: import ova file
+        VM: create virtual machine
+        Vuln: create vulnerable machine
+    dhcp: dhcpserver
+        create: create dhcp server
+        list: list dhcp server
+        remove: remove dhcp server
+    intnet: list internal network
     remove_machine: remove a machine
     remove_lab: remove a lab
     clone: clone a machine
-    upgrade: upgrade version of a machine (iso)
+    lab: move machine to a different lab
 ```
 - Should use ```setup.ps1``` and ```lab.json``` in the same directory
 ```powershell
