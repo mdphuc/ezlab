@@ -40,9 +40,9 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
 }elseif($setting -eq "vm"){
     $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
-    # $MediaPath = "$(Read-Host "Path: ")"
+    
     $MediaPath = Read-Host "Path"
-    # $OSType = Read-Host "OS: "
+    
     $OSType = Read-Host "OS type"
     $CPU = Read-Host "CPU"
     $RAM = Read-Host "RAM (in MB)"
@@ -98,21 +98,22 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     if($option -eq "create" -And $option -ne "list" -And $option -ne "remove"){
         $NetworkName = Read-Host "Network Name"
         Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
-        Write-Host "Created network name $($(NetworkName))"
+        Write-Host "Successfully create network name $($(NetworkName))"
     }elseif($option -eq "list"){
         Invoke-Command {.\VBoxManage.exe list dhcpservers}
     }elseif($option -eq "remove"){
         $NetworkName = Read-Host "Network Name"
         Invoke-Command {.\VBoxManage.exe dhcpserver remove --network $NetworkName}
+        Write-Host "Successfully delete network name $($(NetworkName))"
     }else{
         Write-Host "Invalid Option"
     }
 }elseif($setting -eq "Vuln"){
     $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
-    # $MediaPath = "$(Read-Host "Path: ")"
+    
     $MediaPath = Read-Host "Path"
-    # $OSType = Read-Host "OS: "
+    
     $OSType = Read-Host "OS type"
     $CPU = Read-Host "CPU"
     $RAM = Read-Host "RAM (in MB)"
@@ -160,10 +161,12 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
        
     }
 }elseif($setting -eq "remove_machine"){
+    $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
     try{
         Invoke-Command {.\VBoxManage.exe unregistervm $Name --delete}
         Invoke-Command {.\VBoxManage.exe dhcpserver remove --network "IsolatedNetwork$($lab_number)"}
+        Write-Host "Successfully delete machine named $($Name)"
     }catch{
         Write-Host $_
     }
@@ -177,6 +180,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         try{
             Invoke-Command {.\VBoxManage.exe unregistervm $machine --delete}
             Invoke-Command {.\VBoxManage.exe dhcpserver remove --network "IsolatedNetwork$($lab_number)"}
+            Write-Host "Successfully delete lab named Lab$($lab_number)"
         }catch{
             Write-Host $_
         }
@@ -199,7 +203,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     try{
         Invoke-Comamnd {.\VBoxManage.exe modifyvm $Name --groups "Lab$($lab_number)/VM"}
         Invoke-Command {.\VBoxManage.exe modifyvm $Name --intnet1 "IsolatedNetwork$($lab_number)"}
-
+        Write-Host "Successfully move machine named $($Name) to Lab Lab$($lab_number)"
     }catch{
         Write-Host $_
     }
@@ -207,34 +211,32 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
     $Type = Read-Host "Type (VM, Vuln)"
-    # $MediaPath = "$(Read-Host "Path: ")"
-    $MediaPath = Read-Host "Path"
-    # $OSType = Read-Host "OS: "
-    $OSType = Read-Host "OS type"
-    $CPU = Read-Host "CPU"
-    $RAM = Read-Host "RAM (in MB)"
-    $VRAM = Read-Host "VRAM (in MB)"
-    $Size = Read-Host "Size (in MB)"
-    if($CPU -eq $null -Or $CPU -lt 1){
-        $CPU = 2
-    }
-    if($RAM -eq $null -Or $RAM -lt 100){
-        $RAM = 1024
-    }
-     if($VRAM -eq $null -Or $VRAM -lt 7){
-        $VRAM = 12
-    }
-     if($Size -eq $null -Or $Size -lt 5120){
-        $Size = 30720
-    }
-    if($Name -eq $null -Or $MediaPath -eq $null -Or $OSType -eq $null){
-        Write-Host "There are some problem associated with the value of VM Name, Path, or OS"
-    
-    }else{
-        if($Type -eq "VM" -Or $Type -eq "Vuln"){
+    if($Type -eq "VM" -Or $Type -eq "Vuln"){
+        $MediaPath = Read-Host "Path"
+        $OSType = Read-Host "OS type"
+        $CPU = Read-Host "CPU"
+        $RAM = Read-Host "RAM (in MB)"
+        $VRAM = Read-Host "VRAM (in MB)"
+        $Size = Read-Host "Size (in MB)"
+        if($CPU -eq $null -Or $CPU -lt 1){
+            $CPU = 2
+        }
+        if($RAM -eq $null -Or $RAM -lt 100){
+            $RAM = 1024
+        }
+        if($VRAM -eq $null -Or $VRAM -lt 7){
+            $VRAM = 12
+        }
+        if($Size -eq $null -Or $Size -lt 5120){
+            $Size = 30720
+        }
+        if($Name -eq $null -Or $MediaPath -eq $null -Or $OSType -eq $null){
+            Write-Host "There are some problem associated with the value of VM Name, Path, or OS"
+        }else{
             $VMNum = $(Invoke-Command {.\VBoxManage.exe list vms}).Length
             try{
                 Invoke-Command {.\VBoxManage.exe import $MediaPath --vsys 0 --vmname $Name --cpus $CPU --memory $RAM}
+                Invoke-Command {.\VBoxManage.exe modifyvm $Name --groups "/Lab$($lab_number)/$($Type)"}
                 try{
                     $NetworkName = "IsolatedNetwork$($lab_number)"
                     Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
@@ -254,9 +256,10 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
             }catch{
                 Write-Host $_
             }
-        }else{
-            Write-Host "Invalid Type"
+        
         }
+    }else{
+        Write-Host "Invalid Type"
     }
 }
 
