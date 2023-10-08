@@ -71,9 +71,9 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --groups "/Lab$($lab_number)/VM"}
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --cpus $CPU --memory $RAM --vram $VRAM} 
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --graphicscontroller vmsvga}
-            Invoke-Command {.\VBoxManage.exe createhd --filename "$($env:USERPROFILE)\VirtualBox VMs\$($Name)\$($Name).vdi" --size $Size --variant Standard}
+            Invoke-Command {.\VBoxManage.exe createhd --filename "$($env:USERPROFILE)\VirtualBox VMs\Lab$($lab_number)VM\$($Name)\$($Name).vdi" --size $Size --variant Standard}
             Invoke-Command {.\VBoxManage.exe storagectl $Name --name "SATA Controller $($VMNum)" --add sata --bootable on}
-            Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "SATA Controller $($VMNum)" --port 0 --device 0 --type hdd --medium "$($env:USERPROFILE)\VirtualBox VMs\$($Name)\$($Name).vdi"} 
+            Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "SATA Controller $($VMNum)" --port 0 --device 0 --type hdd --medium "$($env:USERPROFILE)\VirtualBox VMs\Lab$($lab_number)VM\$($Name)\$($Name).vdi"} 
             Invoke-Command {.\VBoxManage.exe storagectl $Name --name "IDE Controller $($VMNum)" --add ide}
             # Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "IDE Controller $($VMNum)" --port 0 --device 0 --type dvddrive --medium $MediaPath}
             Invoke-Command {.\VBoxManage.exe unattended install $Name --iso=$MediaPath --user=$username --password=$password}
@@ -160,9 +160,9 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --groups "/Lab$($lab_number)/Vuln"}
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --cpus $CPU --memory $RAM --vram $VRAM} 
             Invoke-Command {.\VBoxManage.exe modifyvm $Name --graphicscontroller vmsvga}
-            Invoke-Command {.\VBoxManage.exe createhd --filename "$($env:USERPROFILE)\VirtualBox VMs\$($Name)\$($Name).vdi" --size $Size --variant Standard}
+            Invoke-Command {.\VBoxManage.exe createhd --filename "$($env:USERPROFILE)\VirtualBox VMs\Lab$($lab_number)Vuln\$($Name)\$($Name).vdi" --size $Size --variant Standard}
             Invoke-Command {.\VBoxManage.exe storagectl $Name --name "SATA Controller $($VMNum)" --add sata --bootable on}
-            Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "SATA Controller $($VMNum)" --port 0 --device 0 --type hdd --medium "$($env:USERPROFILE)\VirtualBox VMs\$($Name)\$($Name).vdi"} 
+            Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "SATA Controller $($VMNum)" --port 0 --device 0 --type hdd --medium "$($env:USERPROFILE)\VirtualBox VMs\Lab$($lab_number)Vuln\$($Name)\$($Name).vdi"} 
             Invoke-Command {.\VBoxManage.exe storagectl $Name --name "IDE Controller $($VMNum)" --add ide}
             Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "IDE Controller $($VMNum)" --port 0 --device 0 --type dvddrive --medium $MediaPath}
             try{
