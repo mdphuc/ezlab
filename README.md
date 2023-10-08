@@ -45,9 +45,9 @@ git clone https://github.com/mdphuc/ezlab.git
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you think should be changed.
 
-## Disclaimer
+## Constraints
 This works fine on Powershell 5+ and Virtual Box 7.
-For Virtual Box 6., please replace line 178:
+For Virtual Box 6., please replace line 197:
 ```
 $machine = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2 -19 -2)
 ```
@@ -55,6 +55,15 @@ to this
 ```
 $machine = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2)
 ```
+and also replace line 194:
+```
+$vmsl = Invoke-Command {.\VBoxManage.exe list -l vms | Select-String "/Lab$($lab_number)/VM" -Context 2,0 -CaseSensitive}
+```
+to this
+```
+$vmsl = Invoke-Command {.\VBoxManage.exe list -l vms | Select-String "/Lab$($lab_number)/VM" -Context 1,0 -CaseSensitive}
+```
+The number of labs is below 255
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

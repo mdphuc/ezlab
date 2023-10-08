@@ -103,11 +103,20 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         $LowerIP = Read-Host "Lower IP"
         $UpperIP = Read-Host "Upper IP"
         $SubnetMask = Read-Host "Subnet Mask"
-        try{
-            Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=$ServerIP --lower-ip=$LowerIP --upper-ip=$UpperIP --netmask=$SubnetMask --enable}
-            Write-Host "Successfully create network name $($NetworkName))"
-        }catch{
-            Write-Host $_
+        $ServerIP_examine = $ServerIP.Split(".")
+        $ServerIP_examine = $ServerIP_examine[0] + "." + $ServerIP_examine[1] + "." + $ServerIP_examine[2]
+
+        $serverip_check = Invoke-Command {.\VBoxManage.exe list -l dhcpservers | Select-String "$($ServerIP_examine)" -Context 1,0 -CaseSensitive}
+        if($serverip_check -ne $null){
+            Write-Host "A dhcpserver has that IP address. Run 'dhcp list' for more information"
+
+        }else{
+            try{
+                Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=$ServerIP --lower-ip=$LowerIP --upper-ip=$UpperIP --netmask=$SubnetMask --enable}
+                Write-Host "Successfully create network name $($NetworkName))"
+            }catch{
+                Write-Host $_
+            }
         }
     }elseif($option -eq "list"){
         Invoke-Command {.\VBoxManage.exe list dhcpservers}
