@@ -42,7 +42,8 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     $Name = Read-Host "Name"
     
     $MediaPath = Read-Host "Path"
-    
+    $username = Read-Host "Username"
+    $password = Read-Host "Password"
     $OSType = Read-Host "OS type"
     $CPU = Read-Host "CPU"
     $RAM = Read-Host "RAM (in MB)"
@@ -74,10 +75,11 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
             Invoke-Command {.\VBoxManage.exe storagectl $Name --name "SATA Controller $($VMNum)" --add sata --bootable on}
             Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "SATA Controller $($VMNum)" --port 0 --device 0 --type hdd --medium "$($env:USERPROFILE)\VirtualBox VMs\$($Name)\$($Name).vdi"} 
             Invoke-Command {.\VBoxManage.exe storagectl $Name --name "IDE Controller $($VMNum)" --add ide}
-            Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "IDE Controller $($VMNum)" --port 0 --device 0 --type dvddrive --medium $MediaPath}
+            # Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "IDE Controller $($VMNum)" --port 0 --device 0 --type dvddrive --medium $MediaPath}
+            Invoke-Command {.\VBoxManage.exe unattended install $Name --iso=$MediaPath --user=$username --password=$password}
             try{
                 $NetworkName = "IsolatedNetwork$($lab_number)"
-                Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
+                Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.$(lab_number).1 --lower-ip=10.38.$(lab_number).10 --upper-ip=10.38.$(lab_number).140 --netmask=255.255.255.0 --enable}
             }catch{
                 $ErrorActionPreference = "Continue"
             }
@@ -97,8 +99,15 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     $option = Read-Host "Option (create, list, remove)"
     if($option -eq "create" -And $option -ne "list" -And $option -ne "remove"){
         $NetworkName = Read-Host "Network Name"
-        Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
-        Write-Host "Successfully create network name $($(NetworkName))"
+        $ServerIP = Read-Host "Server IP"
+        $LowerIP = Read-Host "Lower IP"
+        $UpperIP = Read-Host "Upper IP"
+        try{
+            Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=$ServerIP --lower-ip=$LowerIP --upper-ip=$UpperIP --netmask=255.255.255.0 --enable}
+            Write-Host "Successfully create network name $($(NetworkName))"
+        }catch{
+            Write-Host $_
+        }
     }elseif($option -eq "list"){
         Invoke-Command {.\VBoxManage.exe list dhcpservers}
     }elseif($option -eq "remove"){
@@ -148,7 +157,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
             Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "IDE Controller $($VMNum)" --port 0 --device 0 --type dvddrive --medium $MediaPath}
             try{
                 $NetworkName = "IsolatedNetwork$($lab_number)"
-                Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
+                Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.$(lab_number).1 --lower-ip=10.38.$(lab_number).10 --upper-ip=10.38.$(lab_number).140 --netmask=255.255.255.0 --enable}
             }catch{
                 $ErrorActionPreference = "Continue"
             }
@@ -239,7 +248,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
                 Invoke-Command {.\VBoxManage.exe modifyvm $Name --groups "/Lab$($lab_number)/$($Type)"}
                 try{
                     $NetworkName = "IsolatedNetwork$($lab_number)"
-                    Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.1.1 --lower-ip=10.38.1.10 --upper-ip=10.38.1.140 --netmask=255.255.255.0 --enable}
+                    Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=10.38.$(lab_number).1 --lower-ip=10.38.$(lab_number).10 --upper-ip=10.38.$(lab_number).140 --netmask=255.255.255.0 --enable}
                 }catch{
                     $ErrorActionPreference = "Continue"
                 }
