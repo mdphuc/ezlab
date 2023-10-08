@@ -183,6 +183,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
     try{
+        Invoke-Command {.\VBoxManage.exe modifyvm $machine --groups ""}
         Invoke-Command {.\VBoxManage.exe unregistervm $Name --delete}
         Invoke-Command {.\VBoxManage.exe dhcpserver remove --network "IsolatedNetwork$($lab_number)"}
         Write-Host "Successfully delete machine named $($Name)"
@@ -197,6 +198,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         $machine = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2 -19 -2)
         Write-Host $machine
         try{
+            Invoke-Command {.\VBoxManage.exe modifyvm $machine --groups ""}
             Invoke-Command {.\VBoxManage.exe unregistervm $machine --delete}
             Invoke-Command {.\VBoxManage.exe dhcpserver remove --network "IsolatedNetwork$($lab_number)"}
             Write-Host "Successfully delete lab named Lab$($lab_number)"
