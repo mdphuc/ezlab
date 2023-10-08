@@ -33,7 +33,6 @@ git clone https://github.com/mdphuc/ezlab.git
     clone: clone a machine
     lab: move machine to a different lab
 ```
-- Should use ```setup.ps1``` and ```lab.json``` in the same directory
 ```powershell
 ./setup.ps1 vm & ./setup.ps1 vuln
 ```
