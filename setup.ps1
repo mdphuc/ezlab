@@ -102,9 +102,10 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         $ServerIP = Read-Host "Server IP"
         $LowerIP = Read-Host "Lower IP"
         $UpperIP = Read-Host "Upper IP"
+        $SubnetMask = Read-Host "Subnet Mask"
         try{
-            Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=$ServerIP --lower-ip=$LowerIP --upper-ip=$UpperIP --netmask=255.255.255.0 --enable}
-            Write-Host "Successfully create network name $($(NetworkName))"
+            Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip=$ServerIP --lower-ip=$LowerIP --upper-ip=$UpperIP --netmask=$SubnetMask --enable}
+            Write-Host "Successfully create network name $($NetworkName))"
         }catch{
             Write-Host $_
         }
