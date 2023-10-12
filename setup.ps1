@@ -7,7 +7,7 @@ $username = $env:USERNAME
 
 cd "$($drive)\Program Files\Oracle\VirtualBox"
 
-if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $setting -ne "Vuln" -And $setting -ne "natnet" -And $setting -ne "remove_machine" -And $setting -ne "remove_lab" -And $setting -ne "clone" -And $setting -ne "upgrade" -And $setting -ne "ova" -And $setting -ne "lab" -And $setting -ne "network_remove" -And $setting -ne "dhcp"){
+if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $setting -ne "Vuln" -And $setting -ne "natnet" -And $setting -ne "remove_machine" -And $setting -ne "remove_lab" -And $setting -ne "clone" -And $setting -ne "upgrade" -And $setting -ne "ova" -And $setting -ne "lab" -And $setting -ne "network_remove" -And $setting -ne "dhcp" -And $setting -ne "graph"){
     Write-Host "
 ./setup.ps1
 
@@ -34,6 +34,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     remove_lab: remove a lab
     clone: clone a machine
     lab: move machine to a different lab
+    graph: graph of all machine in a lab 
     "
 }elseif($setting -eq "os"){
     Invoke-Command{.\VBoxManage.exe list ostypes} | ForEach-Object -Process {Write-Host $_}
@@ -208,17 +209,22 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     }
 }elseif($setting -eq "clone"){
     $Name = Read-Host "Name of the machine you want to clone"
-    $Name_clone = Read-Host "Name of new machine"
-    $lab_number = Read-Host "Lab number" 
-    try{
-        Invoke-Command {.\VBoxManage.exe clonevm $Name --name $Name_clone --register --mode=all}
-        Invoke-Command {.\VBoxManage.exe modifyvm $Name_clone --groups "/Lab$($lab_number)/VM"}
-        Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip="10.38.$($lab_number).1" --lower-ip="10.38.$($lab_number).10" --upper-ip="10.38.$($lab_number).140" --netmask=255.255.255.0 --enable}
+    $Type = Read-Host "Type (VM, Vuln, Router)"
+    if ($Type -ne "VM" -AND $Type -ne "Vuln" -AND $Type -ne "Router"){
+        Write-Host "Invalid Type"
+    }else{
+        $Name_clone = Read-Host "Name of new machine"
+        $lab_number = Read-Host "Lab number" 
+        try{
+            Invoke-Command {.\VBoxManage.exe clonevm $Name --name $Name_clone --register --mode=all}
+            Invoke-Command {.\VBoxManage.exe modifyvm $Name_clone --groups "/Lab$($lab_number)/$($Type)"}
+            Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip="10.38.$($lab_number).1" --lower-ip="10.38.$($lab_number).10" --upper-ip="10.38.$($lab_number).140" --netmask=255.255.255.0 --enable}
 
-        Invoke-Command {.\VBoxManage.exe modifyvm $Name_clone --intnet1 "IsolatedNetwork$($lab_number)"}
-        Write-Host "Successfully clone $($Name)"
-    }catch{
-        Write-Host $_
+            Invoke-Command {.\VBoxManage.exe modifyvm $Name_clone --intnet1 "IsolatedNetwork$($lab_number)"}
+            Write-Host "Successfully clone $($Name)"
+        }catch{
+            Write-Host $_
+        }
     }
 }elseif($setting -eq "lab"){
     $Name = Read-Host "Name of the machine you want to move:"
@@ -283,6 +289,35 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
         }
     }else{
         Write-Host "Invalid Type"
+    }
+}elseif($setting -eq "graph"){
+    $option = Read-Host "Option (help, show)"
+    if($option -ne "help" -AND $option -ne "show"){
+        Write-Host "Invalid option"
+    }elseif($option -eq "help"){
+        Write-Host "
+Blue Rectangle: virtual machine
+Red Rectangle: bulnerable machine
+Ping Triangle: server
+Green Circle: router, switch, etc
+White Circle: unknown
+        "
+    }elseif($option -eq "show"){
+        $lab_number = Read-Host "Lab number"
+        $vmsl = Invoke-Command {.\VBoxManage.exe list -l vms | Select-String "/Lab$($lab_number)/VM" -Context 2,0 -CaseSensitive}
+        $machine_graph = @()
+        ForEach($machine in $vmsl){
+            $machine = $machine -replace " ",""
+            $machine_name = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2 -19 -2)
+            $machine_type = $machine.SubString($machine.Length-2,2)
+            $machine_combine = $machine_name + "-" + $machine_type
+            $machine_graph += @($machine_combine)
+        }
+
+
+        cd "$($env:USERPROFILE)\AppData\Local\Programs\Python\Python39"
+        Invoke-Command {.\python.exe "$($location)/graph.py" $($machine_graph)}
+        cd "$($drive)\Program Files\Oracle\VirtualBox"
     }
 }
 
