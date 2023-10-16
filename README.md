@@ -3,7 +3,7 @@
 
 This project is designed to help create, view, maintain virtual machine and hacking lab on Virtual Box on Windows faster and more convenient
 ## Installation 
-Use ```[git]("https://git-scm.com/")``` to install:
+Use <a href="https://git-scm.com/" target="_blank">git</a> to install:
 ```bash
 git clone https://github.com/mdphuc/ezlab.git
 ```
