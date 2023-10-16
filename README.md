@@ -1,4 +1,4 @@
-# EzLab v1.0
+# EzLab v2.0
 This project is designed to help create virtual machine and hacking lab on Virtual Box on Windows faster and more convenient
 ## Installation 
 Use [git]("https://git-scm.com/") to install:
@@ -6,6 +6,7 @@ Use [git]("https://git-scm.com/") to install:
 git clone https://github.com/mdphuc/ezlab.git
 ```
 ## Usage
+run ```pip install -r requirement.txt```
 ```powershell
 ./setup.ps1
 
@@ -36,21 +37,19 @@ git clone https://github.com/mdphuc/ezlab.git
         help: help
         show: build graph
 ```
-```powershell
-./setup.ps1 vm & ./setup.ps1 vuln
-```
-<img width="550" alt="commandvm" src="https://github.com/mdphuc/hacklab/assets/41264640/5cf68ab6-c555-4c98-811d-9a31e207b4f0">
 
 ## Recommended System Requirement
 - Windows 10+
-- Virtual Box 7+ 
+- Virtual Box 6+
+- Function ```graph``` can only work on Virtual Box version 7+ - which support ```guest addition```
+- ```unintended install``` when calling ```vm``` or ```vuln``` can work on Virtual Box 6.x, but there's no gurantee it will give a complete unexpected install process like in version 7.x of Virtual Box
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you think should be changed.
 
 ## Constraints
-This works fine on Powershell 5+ and Virtual Box 7.
-For Virtual Box 6., please replace line 197:
+This works fine on Powershell 5+ and Virtual Box 7.x
+For Virtual Box 6.x, please replace line 202:
 ```
 $machine = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2 -19 -2)
 ```
@@ -58,7 +57,7 @@ to this
 ```
 $machine = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2)
 ```
-and also replace line 194:
+and also replace line 199:
 ```
 $vmsl = Invoke-Command {.\VBoxManage.exe list -l vms | Select-String "/Lab$($lab_number)/VM" -Context 2,0 -CaseSensitive}
 ```
