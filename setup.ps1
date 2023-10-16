@@ -35,6 +35,8 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     clone: clone a machine
     lab: move machine to a different lab
     graph: graph of all machine in a lab 
+        help: help
+        show: build graph
     "
 }elseif($setting -eq "os"){
     Invoke-Command{.\VBoxManage.exe list ostypes} | ForEach-Object -Process {Write-Host $_}
@@ -298,27 +300,69 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     }elseif($option -eq "help"){
         Write-Host "
 Blue Rectangle: virtual machine
-Red Rectangle: bulnerable machine
-Ping Triangle: server
-Green Circle: router, switch, etc
-White Circle: unknown
+Red Rectangle: vulnerable machine
+Green Triangle: dhcpserver
         "
     }elseif($option -eq "show"){
         $lab_number = Read-Host "Lab number"
         $vmsl = Invoke-Command {.\VBoxManage.exe list -l vms | Select-String "/Lab$($lab_number)/VM" -Context 2,0 -CaseSensitive}
-        $machine_graph = @()
         ForEach($machine in $vmsl){
+            $machine_graph = @()
+            $dhcps = @()
+            $machine_combine = ""
+            $dhcp = ""
+            $number = 0
             $machine = $machine -replace " ",""
             $machine_name = $machine.SubString(5,$machine.Length - 5 - 15 - $lab_number.Length -2 -19 -2)
             $machine_type = $machine.SubString($machine.Length-2,2)
-            $machine_combine = $machine_name + "-" + $machine_type
+            $details = Invoke-Command {.\VBoxManage.exe showvminfo $machine_name | Select-String "State" -CaseSensitive}
+            ForEach($detail in $details){
+                $detail = $detail.ToString()
+                $detail = $detail.SubString(29,$detail.Length - 29)
+            }
+            $machine_combine += $machine_name + "/" + $machine_type + "/" + $detail + "/"
+            for($i=0; $i -le 4; $i ++){
+                try{
+                    $nics = Invoke-Command {.\VBoxManage.exe showvminfo $machine_name | Select-String "NIC $($i+1)" -CaseSensitive}
+                    $nic = $nics[0].ToString().Split(",")
+                    $nic = $nic[1].ToString().SubString(13,$nic[1].Length - 13)
+                    $machine_combine += "NIC$($i+1)+$($nic):"
+                    $number += 1
+                }catch{
+                    $ErrorActionPreference = "Continue"
+                }
+                try{
+                    $networks = Invoke-Command {.\VBoxManage.exe guestproperty enumerate $machine_name | Select-String "/VirtualBox/GuestInfo/Net/$($i)/V4/IP" -CaseSensitive}
+                    $netmasks = Invoke-Command {.\VBoxManage.exe guestproperty enumerate $machine_name | Select-String "/VirtualBox/GuestInfo/Net/$($i)/V4/Netmask" -CaseSensitive}
+                    $network = $networks[0].ToString().Split("'")[1]
+                    $netmask = $netmasks[0].ToString().Split("'")[1]
+                    $machine_combine += "IP,$network;Netmask,$netmask/"
+
+                    $network_gen = $network.Split(".")
+                    $net = $network_gen[0] + "." + $network_gen[1] + "." + $network_gen[2]
+                   
+                    if($nic -contains "NAT"){
+                        $dhcp += "Dhcpd IP:       10.0.2.2"
+                    }else{
+                        $dhcpservers = Invoke-Command {.\VBoxManage.exe list dhcpservers | Select-String "$($net)" -CaseSensitive}
+                        ForEach($dhcpserver in $dhcpservers){
+                            $dhcp += "$($dhcpserver.ToString())`n"
+                        }
+                        $dhcp += "/`n"
+                    }
+                }catch{
+                    $ErrorActionPreference = "Continue"
+                }
+            }
+            $machine_combine = "|" +  $number.ToString() + "/" + $machine_combine
             $machine_graph += @($machine_combine)
+            $dhcps += @($dhcp)
         }
 
 
-        # cd "$($env:USERPROFILE)\AppData\Local\Programs\Python\Python39"
-        # Invoke-Command {.\python.exe "$($location)/graph.py" $($machine_graph)}
-        # cd "$($drive)\Program Files\Oracle\VirtualBox"
+        cd "$($env:USERPROFILE)\AppData\Local\Programs\Python\Python39"
+        Invoke-Command {.\python.exe "$($location)/graph.py" $($machine_graph) $($dhcps)}
+        cd "$($drive)\Program Files\Oracle\VirtualBox"
         
     }
 }

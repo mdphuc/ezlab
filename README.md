@@ -32,6 +32,9 @@ git clone https://github.com/mdphuc/ezlab.git
     remove_lab: remove a lab
     clone: clone a machine
     lab: move machine to a different lab
+    graph: graph of all machine in a lab 
+        help: help
+        show: build graph
 ```
 ```powershell
 ./setup.ps1 vm & ./setup.ps1 vuln
@@ -40,7 +43,7 @@ git clone https://github.com/mdphuc/ezlab.git
 
 ## Recommended System Requirement
 - Windows 10+
-- 8GB is fine, 16GB+ is recommended
+- Virtual Box 7+ 
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you think should be changed.
