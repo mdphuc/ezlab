@@ -3,7 +3,7 @@
 
 This project is designed to help create, view, maintain virtual machine and hacking lab on Virtual Box on Windows faster and more convenient
 ## Table of Content
-1) [Installation](#installtion)
+1) [Installation](#installation)
 2) [Usage](#usage)
 3) [Recommend System Requirement](#recommend-system-requirement)
 4) [Contributing Policy](#contributing)
