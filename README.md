@@ -1,5 +1,7 @@
 # EzLab v2.0
-This project is designed to help create virtual machine and hacking lab on Virtual Box on Windows faster and more convenient
+<img src=https://github.com/mdphuc/ezlab/assets/41264640/f062bde3-ba74-48c8-bff1-5be0387aee90 style="width:250px;height:auto">
+
+This project is designed to help create, view, maintain virtual machine and hacking lab on Virtual Box on Windows faster and more convenient
 ## Installation 
 Use [git]("https://git-scm.com/") to install:
 ```bash
