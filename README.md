@@ -5,7 +5,7 @@ This project is designed to help create, view, maintain virtual machine and hack
 ## Table of Content
 1) [Installation](#installation)
 2) [Usage](#usage)
-3) [Recommend System Requirement](#recommend-system-requirement)
+3) [Requirement](#requirement)
 4) [Contributing Policy](#contributing)
 5) [Constraints](#constraints)
 6) [License](#license)
@@ -47,7 +47,7 @@ run ```pip install -r requirement.txt```
         show: build graph
 ```
 
-## Recommended System Requirement
+## Requirement
 - Windows 10+
 - Virtual Box 6+
 - Function ```graph``` can only work on Virtual Box version 7+ - which support ```guest addition```
