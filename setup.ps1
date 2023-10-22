@@ -7,7 +7,7 @@ $username = $env:USERNAME
 
 cd "$($drive)\Program Files\Oracle\VirtualBox"
 
-if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $setting -ne "Vuln" -And $setting -ne "natnet" -And $setting -ne "remove_machine" -And $setting -ne "remove_lab" -And $setting -ne "clone" -And $setting -ne "upgrade" -And $setting -ne "ova" -And $setting -ne "lab" -And $setting -ne "network_remove" -And $setting -ne "dhcp" -And $setting -ne "graph"){
+if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $setting -ne "vuln" -And $setting -ne "natnet" -And $setting -ne "remove_machine" -And $setting -ne "remove_lab" -And $setting -ne "clone" -And $setting -ne "upgrade" -And $setting -ne "ova" -And $setting -ne "lab" -And $setting -ne "network_remove" -And $setting -ne "dhcp" -And $setting -ne "graph"){
     Write-Host "
 ./setup.ps1
 
@@ -130,7 +130,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     }else{
         Write-Host "Invalid Option"
     }
-}elseif($setting -eq "Vuln"){
+}elseif($setting -eq "vuln"){
     $lab_number = Read-Host "Lab number"
     $Name = Read-Host "Name"
     
@@ -167,8 +167,7 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
             Invoke-Command {.\VBoxManage.exe storagectl $Name --name "SATA Controller $($VMNum)" --add sata --bootable on}
             Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "SATA Controller $($VMNum)" --port 0 --device 0 --type hdd --medium "$($env:USERPROFILE)\VirtualBox VMs\Lab$($lab_number)\Vuln\$($Name)\$($Name).vdi"} 
             Invoke-Command {.\VBoxManage.exe storagectl $Name --name "IDE Controller $($VMNum)" --add ide}
-            # Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "IDE Controller $($VMNum)" --port 0 --device 0 --type dvddrive --medium $MediaPath}
-            Invoke-Command {.\VBoxManage.exe unattended install $Name --iso=$MediaPath --install-additions}
+            Invoke-Command {.\VBoxManage.exe storageattach $Name --storagectl "IDE Controller $($VMNum)" --port 0 --device 0 --type dvddrive --medium $MediaPath}
             try{
                 $NetworkName = "IsolatedNetwork$($lab_number)"
                 Invoke-Command {.\VBoxManage.exe dhcpserver add --network=$NetworkName --server-ip="10.38.$($lab_number).1" --lower-ip="10.38.$($lab_number).10" --upper-ip="10.38.$($lab_number).140" --netmask=255.255.255.0 --enable}
