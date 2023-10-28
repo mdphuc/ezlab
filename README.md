@@ -47,8 +47,8 @@ run ```pip install -r requirement.txt```
                                         show: build graph
     module:                         build powershell module
 ```
-For module function: run ```./setup.ps1 module```
-Then when run the program again, just simply run ```ezlab```
+- For module function: run ```./setup.ps1 module```
+- Then when run the program again, just simply run ```ezlab```
 
 ## Requirement
 - Windows 10+
