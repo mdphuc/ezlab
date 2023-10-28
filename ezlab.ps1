@@ -7,7 +7,7 @@ $username = $env:USERNAME
 
 cd "$($drive)\Program Files\Oracle\VirtualBox"
 
-if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $setting -ne "vuln" -And $setting -ne "natnet" -And $setting -ne "remove_machine" -And $setting -ne "remove_lab" -And $setting -ne "clone" -And $setting -ne "upgrade" -And $setting -ne "ova" -And $setting -ne "lab" -And $setting -ne "network_remove" -And $setting -ne "dhcp" -And $setting -ne "graph"){
+if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $setting -ne "vuln" -And $setting -ne "natnet" -And $setting -ne "remove_machine" -And $setting -ne "remove_lab" -And $setting -ne "clone" -And $setting -ne "upgrade" -And $setting -ne "ova" -And $setting -ne "lab" -And $setting -ne "network_remove" -And $setting -ne "dhcp" -And $setting -ne "graph" -And $setting -ne "module"){
     Write-Host "
 ./setup.ps1
 
@@ -20,23 +20,24 @@ if($setting -ne "vm" -And $setting -ne "os" -And $setting -ne "intnet" -And $set
     [VRAM] : Amount of video memory in MB (default: 12) 
     [size] : Size of your disk in MB (default: 30720)
     
-    vm: setup VM
-    vuln: add Vulnerable VM to your environment
-    ova: import ova file
-        VM: create virtual machine
-        Vuln: create vulnerable machine
-    dhcp: dhcpserver
-        create: create dhcp server
-        list: list dhcp server
-        remove: remove dhcp server
-    intnet: list internal network
-    remove_machine: remove a machine
-    remove_lab: remove a lab
-    clone: clone a machine
-    lab: move machine to a different lab
-    graph: graph of all machine in a lab 
-        help: help
-        show: build graph
+    vm:                             setup VM
+    vuln:                           add Vulnerable VM to your environment
+    ova:                            import ova file
+                                        VM: create virtual machine
+                                        Vuln: create vulnerable machine
+    dhcp:                           dhcpserver
+                                        create: create dhcp server
+                                        list: list dhcp server
+                                        remove: remove dhcp server
+    intnet:                         list internal network
+    remove_machine:                 remove a machine
+    remove_lab:                     remove a lab
+    clone:                          clone a machine
+    lab:                            move machine to a different lab
+    graph:                          graph of all machine in a lab 
+                                        help: help
+                                        show: build graph
+    module:                         build powershell module
     "
 }elseif($setting -eq "os"){
     Invoke-Command{.\VBoxManage.exe list ostypes} | ForEach-Object -Process {Write-Host $_}
@@ -363,6 +364,8 @@ Green Triangle: dhcpserver
         Invoke-Command {.\python.exe "$($location)/graph.py" $($machine_graph) $($dhcps)}
         cd "$($drive)\Program Files\Oracle\VirtualBox"
         
+    }elseif($setting -eq "module"){
+        Invoke-Command {powershell -f ./module.ps1}
     }
 }
 
