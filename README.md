@@ -10,12 +10,12 @@ This project is designed to help create, view, maintain virtual machine and hack
 5) [Constraints](#constraints)
 6) [License](#license)
 ## Installation 
+run ```pip install -r requirement.txt```
 Use <a href="https://git-scm.com/" target="_blank">git</a> to install:
 ```bash
 git clone https://github.com/mdphuc/ezlab.git
 ```
 ## Usage
-run ```pip install -r requirement.txt```
 ```powershell
 ./setup.ps1
 
@@ -47,6 +47,8 @@ run ```pip install -r requirement.txt```
                                         show: build graph
     module:                         build powershell module
 ```
+- For module function: run ```./setup.ps1 module``` as administrator
+- Then when run the program again, just simply run ```ezlab```
 
 ## Requirement
 - Windows 10+
