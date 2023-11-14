@@ -56,9 +56,6 @@ git clone https://github.com/mdphuc/ezlab.git
 - Function ```graph``` can only work on Virtual Box version 7+ - which support ```guest addition```
 - ```unintended install``` when calling ```vm``` or ```vuln``` can work on Virtual Box 6.x, but there's no gurantee it will give a complete unexpected install process like in version 7.x of Virtual Box
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you think should be changed.
-
 ## Constraints
 This works fine on Powershell 5+ and Virtual Box 7.x
 For Virtual Box 6.x, please replace line 202:
